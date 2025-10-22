@@ -1,8 +1,8 @@
-# este es el archivo para el codigo de el proyecto 3
-# si les sale esto en el repo y en la pagina, pls escribanme que si funciono o no
-
 import re
 from itertools import product
+from itertools import permutations, combinations, combinations_with_replacement
+from collections import Counter
+from math import factorial
 
 class RelacionesApp:
     def __init__(self):
@@ -251,8 +251,6 @@ class RelacionesApp:
         
     def combinaciones_objetos_iguales(self, conjunto_nombre, k):
         """Calcula todas las combinaciones posibles (con repetición) de k elementos de un conjunto"""
-        from itertools import combinations_with_replacement
-
         if conjunto_nombre not in self.conjuntos:
             print(f"El conjunto '{conjunto_nombre}' no existe.")
             return
@@ -275,50 +273,79 @@ class RelacionesApp:
         print(f"\nTotal de combinaciones: {len(combinaciones)}")
         return combinaciones
 
-def combinaciones_objetos_diferentes(self, conjunto_nombre, k):
-    """Calcula todas las combinaciones posibles (sin repetición) de k elementos de un conjunto"""
-    from itertools import combinations
+    def combinaciones_objetos_diferentes(self, conjunto_nombre, k):
+        """Calcula todas las combinaciones posibles (sin repetición) de k elementos de un conjunto"""
+        if conjunto_nombre not in self.conjuntos:
+            print(f"El conjunto '{conjunto_nombre}' no existe.")
+            return
 
-    if conjunto_nombre not in self.conjuntos:
-        print(f"El conjunto '{conjunto_nombre}' no existe.")
-        return
+        # Como es un conjunto de objetos diferentes, usamos el set directamente.
+        conjunto = sorted(list(self.conjuntos[conjunto_nombre]))
 
-    # Como es un conjunto de objetos diferentes, usamos el set directamente.
-    conjunto = sorted(list(self.conjuntos[conjunto_nombre]))
+        if not conjunto:
+            print("El conjunto está vacío.")
+            return
 
-    if not conjunto:
-        print("El conjunto está vacío.")
-        return
+        try:
+            k = int(k) # Asegurar que k es un entero, aunque se pide en el input, es buena práctica
+        except ValueError:
+            print("El valor de k debe ser un número entero.")
+            return
 
-    try:
-        k = int(k) # Asegurar que k es un entero, aunque se pide en el input, es buena práctica
-    except ValueError:
-        print("El valor de k debe ser un número entero.")
-        return
+        if k <= 0:
+            print("El número de elementos a combinar (k) debe ser positivo.")
+            return
 
-    if k <= 0:
-        print("El número de elementos a combinar (k) debe ser positivo.")
-        return
+        if k > len(conjunto):
+            print(f"Advertencia: k ({k}) es mayor que el número de elementos en el conjunto ({len(conjunto)}). No hay combinaciones posibles.")
+            combinaciones = []
+        else:
+            # Combinaciones SIN repetición
+            combinaciones = list(combinations(conjunto, k))
 
-    if k > len(conjunto):
-        print(f"Advertencia: k ({k}) es mayor que el número de elementos en el conjunto ({len(conjunto)}). No hay combinaciones posibles.")
-        combinaciones = []
-    else:
-        # Combinaciones SIN repetición
-        combinaciones = list(combinations(conjunto, k))
+        print(f"\nCombinaciones SIN repetición (Objetos Diferentes) de {conjunto_nombre} (k={k}):")
+        for c in combinaciones:
+            print(c)
 
-    print(f"\nCombinaciones SIN repetición (Objetos Diferentes) de {conjunto_nombre} (k={k}):")
-    for c in combinaciones:
-        print(c)
+        print(f"\nTotal de combinaciones: {len(combinaciones)}")
+        return combinaciones
 
-    print(f"\nTotal de combinaciones: {len(combinaciones)}")
-    return combinaciones
+    def permutaciones_objetos_diferentes(self, conjunto_nombre, k):
+        if conjunto_nombre not in self.conjuntos:
+            print(f"El conjunto '{conjunto_nombre}' no existe.")
+            return
+
+        conjunto = sorted(self.conjuntos[conjunto_nombre])
+
+        if not conjunto:
+            print("El conjunto está vacío.")
+            return
+
+        try:
+            k = int(k)
+        except ValueError:
+            print("El valor de k debe ser un número entero.")
+            return
+
+        if k <= 0:
+            print("El número de elementos a permutar (k) debe ser positivo.")
+            return
+
+        if k > len(conjunto):
+            print(f"Advertencia: k ({k}) es mayor que el número de elementos en el conjunto ({len(conjunto)}). No hay permutaciones posibles.")
+            permutaciones = []
+        else:
+            permutaciones = list(permutations(conjunto, k))
+
+        print(f"\nPermutaciones SIN repetición (Objetos Diferentes) de {conjunto_nombre} (k={k}):")
+        for p in permutaciones:
+            print(p)
+
+        print(f"\nTotal de permutaciones: {len(permutaciones)}")
+        return permutaciones
 
     def permutaciones_objetos_iguales(self, conjunto_nombre):
         """Calcula el número de permutaciones de objetos iguales (con elementos repetidos) en el conjunto"""
-        from collections import Counter
-        from math import factorial
-
         if conjunto_nombre not in self.conjuntos:
             print(f"El conjunto '{conjunto_nombre}' no existe.")
             return
@@ -367,25 +394,26 @@ def combinaciones_objetos_diferentes(self, conjunto_nombre, k):
     def mostrar_menu(self):
         """Muestra el menú principal de la aplicación"""
         print("\n" + "="*60)
-        print("         OPERACIONES CON RELACIONES")
+        print(" OPERACIONES CON RELACIONES Y CONTEO")
         print("="*60)
-        print("1.  Definir conjunto referencial (universo)")
-        print("2.  Crear nuevo conjunto")
-        print("3.  Crear nueva relación")
-        print("4.  Operaciones básicas de conjuntos (∪, ∩, −, ')')")
-        print("5.  Producto cartesiano")
-        print("6.  Verificar si relación es reflexiva")
-        print("7.  Verificar si relación es simétrica")
-        print("8.  Verificar si relación es transitiva")
-        print("9.  Composición de relaciones (R∘S)")
+        print("1. Definir conjunto referencial (universo)")
+        print("2. Crear nuevo conjunto")
+        print("3. Crear nueva relación")
+        print("4. Operaciones básicas de conjuntos (∪, ∩, −, ')')")
+        print("5. Producto cartesiano")
+        print("6. Verificar si relación es reflexiva")
+        print("7. Verificar si relación es simétrica")
+        print("8. Verificar si relación es transitiva")
+        print("9. Composición de relaciones (R∘S)")
         print("10. Potencia de una relación (R^n)")
         print("11. Verificar operación binaria")
         print("12. Mostrar conjuntos y relaciones")
         print("13. Ejecutar ejemplo del proyecto")
         print("14. Calcular combinaciones de objetos iguales")
-        print("15. Calcular combinaciones de objetos diferentes")  # <-- NUEVA OPCIÓN
-        print("16. Calcular permutaciones de objetos iguales")    # <-- NUEVA OPCIÓN
-        print("17. Salir") # <-- Opción "Salir" actualizada a 17
+        print("15. Calcular combinaciones de objetos diferentes")
+        print("16. Calcular permutaciones de objetos iguales")
+        print("17. Calcular permutaciones de objetos diferentes")
+        print("18. Salir")
         print("="*60)
 
     def ejecutar_ejemplo(self):
@@ -411,8 +439,8 @@ def combinaciones_objetos_diferentes(self, conjunto_nombre, k):
             # bin(E,C,B) - Verificar si E es operación binaria entre C y B
             if 'E' in self.relaciones and 'C' in self.conjuntos and 'B' in self.conjuntos:
                 es_binaria, mensaje = self.operacion_binaria(self.relaciones['E'], 
-                                                           self.conjuntos['C'], 
-                                                           self.conjuntos['B'])
+                                                            self.conjuntos['C'], 
+                                                            self.conjuntos['B'])
                 print(f"bin(E,C,B): {es_binaria} - {mensaje}")
             
             # ref(R,A) - Verificar si R es reflexiva en A
@@ -442,7 +470,7 @@ def combinaciones_objetos_diferentes(self, conjunto_nombre, k):
             
         except Exception as e:
             print(f"Error al ejecutar el ejemplo: {e}")
-    
+
     def ejecutar(self):
         """Ejecuta la aplicación en modo interactivo"""
         print("¡Bienvenido al programa de operaciones con relaciones!")
@@ -450,10 +478,10 @@ def combinaciones_objetos_diferentes(self, conjunto_nombre, k):
         while True:
             try:
                 self.mostrar_menu()
-                opcion = input("\nSeleccione una opción (1-14): ").strip()
+                opcion = input("\nSeleccione una opción (1-18): ").strip()
                 
-                if not opcion.isdigit() or not (1 <= int(opcion) <= 15):
-                    print("ERROR: Opción no válida. Debe ser un número entre 1 y 15.")
+                if not opcion.isdigit() or not (1 <= int(opcion) <= 18):
+                    print("ERROR: Opción no válida. Debe ser un número entre 1 y 18.")
                     continue
                 
                 opcion = int(opcion)
@@ -713,12 +741,57 @@ def combinaciones_objetos_diferentes(self, conjunto_nombre, k):
                     except ValueError:
                         print("Debe ingresar un número entero válido para k.")
 
-                else:  # opcion == 15
-                    print("\n¡Gracias por usar el programa de relaciones!")
-                    print("Saliendo...")
+                elif opcion == 15:
+                    if not self.conjuntos:
+                        print("No hay conjuntos definidos.")
+                        continue
+
+                    print(f"Conjuntos disponibles: {', '.join(self.conjuntos.keys())}")
+                    nombre = input("Seleccione el conjunto: ").strip()
+                    if nombre not in self.conjuntos:
+                        print("Conjunto no válido.")
+                        continue
+
+                    try:
+                        k = int(input("Número de elementos a combinar (k): ").strip())
+                        self.combinaciones_objetos_diferentes(nombre, k)
+                    except ValueError:
+                        print("Debe ingresar un número entero válido para k.")
+
+                elif opcion == 16:
+                    if not self.conjuntos:
+                        print("No hay conjuntos definidos.")
+                        continue
+
+                    print(f"Conjuntos disponibles: {', '.join(self.conjuntos.keys())}")
+                    nombre = input("Seleccione el conjunto: ").strip()
+                    if nombre not in self.conjuntos:
+                        print("Conjunto no válido.")
+                        continue
+
+                    self.permutaciones_objetos_iguales(nombre)
+
+                elif opcion == 17:
+                    if not self.conjuntos:
+                        print("No hay conjuntos definidos.")
+                        continue
+
+                    print(f"Conjuntos disponibles: {', '.join(self.conjuntos.keys())}")
+                    nombre = input("Seleccione el conjunto: ").strip()
+                    if nombre not in self.conjuntos:
+                        print("Conjunto no válido.")
+                        continue
+
+                    try:
+                        k = int(input("Número de elementos a permutar (k): ").strip())
+                        self.permutaciones_objetos_diferentes(nombre, k)
+                    except ValueError:
+                        print("Debe ingresar un número entero válido para k.")
+                
+                elif opcion == 18:
+                    print("\n¡Gracias por usar el programa!")
                     break
 
-                    
             except KeyboardInterrupt:
                 print("\n\nPrograma interrumpido por el usuario")
                 break
