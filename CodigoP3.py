@@ -275,42 +275,95 @@ class RelacionesApp:
         print(f"\nTotal de combinaciones: {len(combinaciones)}")
         return combinaciones
 
-    def permutaciones_objetos_diferentes(self, conjunto_nombre, k=None):
-        """Calcula todas las permutaciones de objetos diferentes de un conjunto"""
-        from itertools import permutations
+def combinaciones_objetos_diferentes(self, conjunto_nombre, k):
+    """Calcula todas las combinaciones posibles (sin repetición) de k elementos de un conjunto"""
+    from itertools import combinations
+
+    if conjunto_nombre not in self.conjuntos:
+        print(f"El conjunto '{conjunto_nombre}' no existe.")
+        return
+
+    # Como es un conjunto de objetos diferentes, usamos el set directamente.
+    conjunto = sorted(list(self.conjuntos[conjunto_nombre]))
+
+    if not conjunto:
+        print("El conjunto está vacío.")
+        return
+
+    try:
+        k = int(k) # Asegurar que k es un entero, aunque se pide en el input, es buena práctica
+    except ValueError:
+        print("El valor de k debe ser un número entero.")
+        return
+
+    if k <= 0:
+        print("El número de elementos a combinar (k) debe ser positivo.")
+        return
+
+    if k > len(conjunto):
+        print(f"Advertencia: k ({k}) es mayor que el número de elementos en el conjunto ({len(conjunto)}). No hay combinaciones posibles.")
+        combinaciones = []
+    else:
+        # Combinaciones SIN repetición
+        combinaciones = list(combinations(conjunto, k))
+
+    print(f"\nCombinaciones SIN repetición (Objetos Diferentes) de {conjunto_nombre} (k={k}):")
+    for c in combinaciones:
+        print(c)
+
+    print(f"\nTotal de combinaciones: {len(combinaciones)}")
+    return combinaciones
+
+    def permutaciones_objetos_iguales(self, conjunto_nombre):
+        """Calcula el número de permutaciones de objetos iguales (con elementos repetidos) en el conjunto"""
+        from collections import Counter
+        from math import factorial
 
         if conjunto_nombre not in self.conjuntos:
             print(f"El conjunto '{conjunto_nombre}' no existe.")
             return
-        
-        conjunto = sorted(self.conjuntos[conjunto_nombre])
-        
-        if not conjunto:
-            print("El conjunto está vacío.")
-            return
-        
-        # Si no se especifica k, usar todos los elementos
-        if k is None:
-            k = len(conjunto)
-        
-        if k <= 0:
-            print("El número de elementos a permutar debe ser positivo.")
-            return
-        
-        if k > len(conjunto):
-            print(f"El número de elementos a permutar ({k}) no puede ser mayor que el tamaño del conjunto ({len(conjunto)}).")
-            return
-        
-        permutaciones = list(permutations(conjunto, k))
-        print(f"\nPermutaciones de {conjunto_nombre} (k={k}):")
-        for p in permutaciones:
-            print(p)
-        
-        print(f"\nTotal de permutaciones: {len(permutaciones)}")
-        return permutaciones
 
-    
-    
+        # --- ADVERTENCIA E INSTRUCCIONES ---
+        print("\n--- PERMUTACIONES DE OBJETOS IGUALES ---")
+        print("Para este cálculo, necesitamos la secuencia de elementos tal cual fueron ingresados, incluyendo repeticiones.")
+        print(f"El conjunto '{conjunto_nombre}' solo tiene elementos únicos: {sorted(self.conjuntos[conjunto_nombre])}")
+
+        # Solicitamos la secuencia con repetición al usuario
+        elementos_input = input("Ingrese la secuencia de elementos *con repetición* (separados por comas, ej: a,a,b,c): ").split(',')
+        elementos_input = [e.strip() for e in elementos_input if e.strip()]
+
+        if not elementos_input:
+            print("Entrada vacía. No se puede calcular la permutación.")
+            return
+
+        N = len(elementos_input)
+        frecuencias = Counter(elementos_input)
+
+        # 1. Calcular el factorial de N (total de elementos)
+        try:
+            numerador = factorial(N)
+        except ValueError:
+            print("El número total de elementos es demasiado grande para calcular el factorial.")
+            return
+
+        # 2. Calcular el denominador (producto de los factoriales de las frecuencias)
+        denominador = 1
+        for count in frecuencias.values():
+            denominador *= factorial(count)
+
+        if denominador == 0:
+            total_permutaciones = 0
+        else:
+            total_permutaciones = numerador / denominador
+
+        print(f"\nSecuencia ingresada: {elementos_input}")
+        print(f"Total de elementos (N): {N}")
+        print(f"Frecuencias (n1, n2, ...): {dict(frecuencias)}")
+        print(f"\nFórmula: N! / (n1! * n2! * ...)")
+        print(f"Total de Permutaciones de Objetos Iguales: {int(total_permutaciones)}")
+
+        return int(total_permutaciones)
+
     def mostrar_menu(self):
         """Muestra el menú principal de la aplicación"""
         print("\n" + "="*60)
@@ -319,7 +372,7 @@ class RelacionesApp:
         print("1.  Definir conjunto referencial (universo)")
         print("2.  Crear nuevo conjunto")
         print("3.  Crear nueva relación")
-        print("4.  Operaciones básicas de conjuntos (∪, ∩, −, ')")
+        print("4.  Operaciones básicas de conjuntos (∪, ∩, −, ')')")
         print("5.  Producto cartesiano")
         print("6.  Verificar si relación es reflexiva")
         print("7.  Verificar si relación es simétrica")
@@ -330,10 +383,11 @@ class RelacionesApp:
         print("12. Mostrar conjuntos y relaciones")
         print("13. Ejecutar ejemplo del proyecto")
         print("14. Calcular combinaciones de objetos iguales")
-        print("15. Calcular permutaciones de objetos diferentes")
-        print("16. Salir")
+        print("15. Calcular combinaciones de objetos diferentes")  # <-- NUEVA OPCIÓN
+        print("16. Calcular permutaciones de objetos iguales")    # <-- NUEVA OPCIÓN
+        print("17. Salir") # <-- Opción "Salir" actualizada a 17
         print("="*60)
-    
+
     def ejecutar_ejemplo(self):
         """Ejecuta el ejemplo proporcionado en el proyecto"""
         print("\n--- Ejecutando ejemplo del proyecto ---")
@@ -396,10 +450,10 @@ class RelacionesApp:
         while True:
             try:
                 self.mostrar_menu()
-                opcion = input("\nSeleccione una opción (1-16): ").strip()
+                opcion = input("\nSeleccione una opción (1-14): ").strip()
                 
-                if not opcion.isdigit() or not (1 <= int(opcion) <= 16):
-                    print("ERROR: Opción no válida. Debe ser un número entre 1 y 16.")
+                if not opcion.isdigit() or not (1 <= int(opcion) <= 15):
+                    print("ERROR: Opción no válida. Debe ser un número entre 1 y 15.")
                     continue
                 
                 opcion = int(opcion)
@@ -659,28 +713,7 @@ class RelacionesApp:
                     except ValueError:
                         print("Debe ingresar un número entero válido para k.")
 
-                elif opcion == 15:
-                    if not self.conjuntos:
-                        print("No hay conjuntos definidos.")
-                        continue
-
-                    print(f"Conjuntos disponibles: {', '.join(self.conjuntos.keys())}")
-                    nombre = input("Seleccione el conjunto: ").strip()
-                    if nombre not in self.conjuntos:
-                        print("Conjunto no válido.")
-                        continue
-                    
-                    try:
-                        k_input = input("Número de elementos a permutar (k) [Enter para usar todos]: ").strip()
-                        if k_input:
-                            k = int(k_input)
-                        else:
-                            k = None  # Usar todos los elementos
-                        self.permutaciones_objetos_diferentes(nombre, k)
-                    except ValueError:
-                        print("Debe ingresar un número entero válido para k o presionar Enter para usar todos los elementos.")
-
-                else:  # opcion == 16
+                else:  # opcion == 15
                     print("\n¡Gracias por usar el programa de relaciones!")
                     print("Saliendo...")
                     break
